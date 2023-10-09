@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Zero-shot Classification Result</title>
+    <link href="{{ url_for('static', path='/css/style_copy.css') }}" rel="stylesheet">
+</head>
+<body>
+    <h1>Zero-shot Classification Scores by Label</h1>
+    <h3>
+        {% for key, value in label_scores.items() %}
+            {{ key }} : {{ value }}
+            <br/>
+        {% endfor %}
+    </h3>
+    <br/>
+    <br/>
+    <h3>Text extracted from the Chart</h3>
+    <br/>
+    <textarea readonly rows="40" cols="100"> {{sequence}}</textarea>
+</body>
+</html>

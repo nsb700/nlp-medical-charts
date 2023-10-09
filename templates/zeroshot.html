@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload PDF Medical Chart</title>
+    <link href="{{ url_for('static', path='/css/style_copy.css') }}" rel="stylesheet">
+    <script src="https://unpkg.com/dropzone@6.0.0-beta.1/dist/dropzone-min.js"></script>
+</head>
+<body>
+
+    <h1>Zero-shot Classification on PDF Medical Charts</h1>
+    <p1><a href="https://huggingface.co/tasks/zero-shot-classification">Zero-shot classification</a> is a Natural
+        Language Processing (NLP) task of leveraging a pre-trained model to classify new unseen text into arbitrary
+        classes of one's choice.
+    </p1>
+    <br/>
+    <br/>
+    <p1>
+        Such a model is useful when the amount of labeled data is small or even absent (like we demonstrate in this
+        application). This is particularly useful in classifying medical charts - because even though medical charts
+        are used extensively in clinical or health insurance settings, the users reading these charts typically do not
+        know how to develop 'Artificial Intelligence' or 'Machine Learning' applications. They will benefit the most
+        if there is classification of medical charts available for them. It will save them a lot of time and money.
+    </p1>
+    <br/>
+    <br/>
+    <p1>
+        This application demonstrates the ability to classify a medical chart using the
+        <a href="https://huggingface.co/facebook/bart-large-mnli">facebook/bart-large-mnli</a> transformer pipeline.
+        User needs to upload a medical chart and then provide at least one classification label. The application
+        extracts text from the chart and runs the transformer on the extracted text. The result is, text extracted 
+        from the chart, and a percentage of how confident the model is about the chart belonging to each of the 
+        classification label/s.
+    </p1>
+
+    <div class="row">
+
+        <div class="column">
+            <h3>1) Upload PDF Medical Chart</h3>
+            <p>Upload up to 1 file.</p>
+            <p>File will be deleted automatically after processing.</p>
+            <form action="/uploadfile" class="dropzone" id="uploadfile_dropzone"></form>
+            <script>
+                let myDropzone = new Dropzone("#uploadfile_dropzone", {paramName: "file_to_upload", maxFiles: 1, maxSize:512000});
+            </script>
+        </div>
+
+        <div class="column">
+            <h3>2) Set classification labels</h3>
+            <p>Add labels one by one. At least 1 label must be provided.</p>
+            <form>
+                <input type="text" name="labelstext" id="lbltxt" required>
+                <input type="submit" class="btn-list" value="Add Label">
+            </form>
+            <div class="container">
+                <ul>
+
+                </ul>
+            </div>
+            <script>
+                var inputText = document.querySelector('#lbltxt');
+                var myButton = document.querySelector('.btn-list');
+                var list = document.querySelector('.container ul');
+                myButton.addEventListener('click', (e)=>{
+                    input_text_value = inputText.value
+                    if(input_text_value != ""){
+                        e.preventDefault();
+
+                        // create li
+                        var myLi = document.createElement('li');
+                        myLi.innerHTML = input_text_value;
+                        list.appendChild(myLi);
+
+                        // create delete button for label
+                        var myDeleteBtn = document.createElement('button');
+                        myDeleteBtn.innerHTML = 'Delete';
+                        myLi.append(myDeleteBtn);
+
+                        //Call post method to add Label
+                        fetch("/labels", {
+                            method: "POST",
+                            headers: {
+                                    "Content-Type": "application/json",
+                                 },
+                            body: JSON.stringify({ "id": input_text_value, "text": input_text_value}),
+                        });     
+                    }
+                    var labeldeletes = document.querySelectorAll('button');
+                    for(let i=0; i<labeldeletes.length; i++){
+                        labeldeletes[i].addEventListener('click', ()=>{ 
+                            var myTxtContent = event.target.parentElement.textContent 
+                            fetch("/labels/"+myTxtContent.substring(0, myTxtContent.length-6), {
+                                method: "DELETE",
+                                headers: {
+                                        "Content-Type": "application/json",
+                                    }
+                            }); 
+
+                            labeldeletes[i].parentElement.style.display = "none";
+                        })
+                    }
+                    inputText.value = "";
+                });
+            </script>
+        </div>
+
+        <div class="column">
+            <div class="row">
+                <h3>3) Run zero-shot Classification</h3>
+                <form action="/zeroshot/" method="post">
+                    <input type="submit" value="Run" name="zero_shot" id="zrosht" required>
+                </form>
+            </div>
+        </div>   
+
+    </div>
+
+</body>
+</html>
