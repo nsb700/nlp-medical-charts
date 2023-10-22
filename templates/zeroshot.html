@@ -38,7 +38,7 @@
             <h3>1) Upload PDF Medical Chart</h3>
             <p>Upload up to 1 file.</p>
             <p>File will be deleted automatically after processing.</p>
-            <form action="/uploadfile" class="dropzone" id="uploadfile_dropzone"></form>
+            <form action="/uploadfile/" class="dropzone" id="uploadfile_dropzone"></form>
             <script>
                 let myDropzone = new Dropzone("#uploadfile_dropzone", {paramName: "file_to_upload", maxFiles: 1, maxSize:512000});
             </script>

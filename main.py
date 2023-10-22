@@ -38,13 +38,13 @@ async def root(request: Request):
 
 
 # Get all labels
-@app.get("/labels")
+@app.get("/labels/")
 async def get_labels():
     return {"labels":labels}
 
 
 # Get single label
-@app.get("/labels/{label_id}")
+@app.get("/labels/{label_id}/")
 async def get_label(label_id: str):
     if label_id in labels.keys():
         return {"label text":labels[label_id]}            
@@ -52,7 +52,7 @@ async def get_label(label_id: str):
 
 
 # Create single label
-@app.post("/labels")
+@app.post("/labels/")
 async def create_label(label: Label):
     if label.id in labels.keys():
         return {"message":f"Label {label.text} already present."}
@@ -62,7 +62,7 @@ async def create_label(label: Label):
 
 
 # Delete single label
-@app.delete("/labels/{label_id}")
+@app.delete("/labels/{label_id}/")
 async def delete_label(label_id: str):
     if label_id in labels.keys():
         del labels[label_id]
@@ -71,7 +71,7 @@ async def delete_label(label_id: str):
         return {"message":f"Label id {label_id} not found to delete."}
 
 
-@app.post("/uploadfile")
+@app.post("/uploadfile/")
 async def upload_file(file_to_upload: UploadFile):
     path_of_uploaded_file = get_path_of_uploaded_file()
     if path_of_uploaded_file:
@@ -92,7 +92,7 @@ def get_path_of_uploaded_file():
         return None
 
 
-@app.post("/zeroshot", response_class=HTMLResponse)
+@app.post("/zeroshot/", response_class=HTMLResponse)
 async def run_zeroshot_classification(request: Request):
     path_of_uploaded_file = get_path_of_uploaded_file()
     if path_of_uploaded_file:
@@ -118,7 +118,7 @@ async def run_zeroshot_classification(request: Request):
         return {"message": "No file uploaded"}
 
 
-@app.post("/deletefile")
+@app.post("/deletefile/")
 async def delete_file():
     path_of_uploaded_file = get_path_of_uploaded_file()
     if path_of_uploaded_file:
