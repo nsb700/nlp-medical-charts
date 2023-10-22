@@ -8,6 +8,8 @@ from fastapi.templating import Jinja2Templates
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi import BackgroundTasks
+
 
 app = FastAPI()
 
@@ -31,6 +33,8 @@ app.mount(
     name="static"
 )
 
+# Initialize the zero-shot classification pipeline
+classifier = pipeline('zero-shot-classification', model='facebook/bart-large-mnli')
 
 @app.get("/")
 async def root(request: Request):
@@ -99,9 +103,7 @@ async def run_zeroshot_classification(request: Request):
         chart = Chart(path_of_uploaded_file)
         chart.read_text_from_chart()
         all_text = ' '.join(chart.list_of_text)
-        checkpoint = 'facebook/bart-large-mnli'
         user_input_labels = [v for k,v in labels.items()]
-        classifier = pipeline('zero-shot-classification', model=checkpoint)
         zero_shot_result = classifier(all_text, candidate_labels=user_input_labels)
         label_scores = dict(zip(zero_shot_result['labels'], zero_shot_result['scores']))
         sequence = zero_shot_result['sequence']
